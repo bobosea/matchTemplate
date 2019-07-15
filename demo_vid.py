@@ -48,14 +48,44 @@ frames = np.array(frames)
 print(frames.size)
 print(frames.shape)
 print(type(frames))
-#print(frames[0])
 
+# reescalado imgenes
 imgScale = 0.2
 frame1 = cv2.resize(frames[0],(int(frames[0].shape[1]*imgScale),int(frames[0].shape[0]*imgScale)))
 frame2 = cv2.resize(frames[20],(int(frames[20].shape[1]*imgScale),int(frames[20].shape[0]*imgScale)))
 
-cv2.imshow('Frame1',frame1)
-cv2.imshow('Frame2',frame2)
+# conversion a escala de grises
+frame1_gs = cv2.cvtColor(frame1, cv2.COLOR_BGR2GRAY)
+frame2_gs = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
+
+print(frame1_gs.shape)
+print(np.sum(frame1_gs[:,:] * frame1_gs[:,:]))
+print(np.sum(frame2_gs * frame2_gs))
+
+suma = np.sum(frame1_gs * frame2_gs)
+
+print(suma)
+
+# correlaciones cruzadas
+VENTANA = 10
+LEN = 1 + 2 * VENTANA
+
+cross_corr = np.zeros((LEN, LEN))
+for x in range(-VENTANA, VENTANA + 1):
+	for y in range(-VENTANA, VENTANA + 1):
+		cross_corr[x + VENTANA, y + VENTANA] = np.sum(frame1_gs[VENTANA : frame1_gs.shape[0] -VENTANA, VENTANA : frame1_gs.shape[1] - VENTANA] * frame2_gs[x + VENTANA : frame2_gs.shape[0] + x - VENTANA, y + VENTANA : frame2_gs.shape[1] + y - VENTANA])
+
+print(cross_corr)
+print(cross_corr.max())
+print(cross_corr.argmax())
+print(cross_corr.argmax() / LEN, cross_corr.argmax() % LEN)
+
+f1 = frame2_gs - frame1_gs
+
+#
+cv2.imshow('Frame',frame1_gs)
+cv2.imshow('Frame1',frame2_gs)
+cv2.imshow('Frame2',f1)
 
 # Press Q on keyboard to  exit
 cv2.waitKey(0)
