@@ -55,10 +55,29 @@ frame2 = cv2.resize(frames[20],(int(frames[20].shape[1]*imgScale),int(frames[20]
 frame1_gs = cv2.cvtColor(frame1, cv2.COLOR_BGR2GRAY)
 frame2_gs = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
 
+auto_corr = cv2.absdiff(frame1_gs, frame2_gs)
+cv2.imshow('Dif', auto_corr)
+
+erode = cv2.erode(auto_corr,np.ones((2,2),np.uint8),1)
+cv2.imshow('erd', erode)
+
+erode2 = cv2.erode(erode,np.ones((2,2),np.uint8),1)
+cv2.imshow('erd2', erode2)
+
+
+dilation = cv2.dilate(erode,np.ones((2,2),np.uint8),1)
+cv2.imshow('dil', dilation)
+
+erode3 = cv2.erode(auto_corr,np.ones((3,3),np.uint8),1)
+cv2.imshow('erd3', erode3)
+
+dilation2 = cv2.dilate(erode3,np.ones((2,2),np.uint8),1)
+cv2.imshow('dil2', dilation2)
+
 print(frame1_gs.shape)
 
 # correlaciones cruzadas
-VENTANA = 1
+VENTANA = 10
 LEN = 1 + 2 * VENTANA
 
 cross_corr = np.zeros((LEN, LEN))
@@ -72,24 +91,37 @@ cross_corr_max_x = cross_corr.argmax() % LEN
 cross_corr_max_y = cross_corr.argmax() // LEN
 
 print(cross_corr/cross_corr.max() )
-print(cross_corr.max())
+#print(cross_corr.max())
 print(cross_corr.argmax())
+print("max:")
 print(cross_corr_max_y, cross_corr_max_x)
 
-frame_diff = cv2.absdiff(frame1_gs[VENTANA : frame1_gs.shape[0] - VENTANA, VENTANA : frame1_gs.shape[1] - VENTANA], frame2_gs[VENTANA : frame1_gs.shape[0] - VENTANA, VENTANA : frame1_gs.shape[1] - VENTANA])
+frame_diffa = cv2.absdiff(frame1_gs[VENTANA : frame1_gs.shape[0] - VENTANA, VENTANA : frame1_gs.shape[1] - VENTANA], frame2_gs[VENTANA : frame1_gs.shape[0] - VENTANA, VENTANA : frame1_gs.shape[1] - VENTANA])
 
 f1 = frame1_gs[VENTANA : frame1_gs.shape[0] - VENTANA, VENTANA : frame1_gs.shape[1] - VENTANA]
 f2 = frame2_gs[cross_corr_max_y : frame2_gs.shape[0] + cross_corr_max_y - 2 * VENTANA, cross_corr_max_x : frame2_gs.shape[1] + cross_corr_max_x - 2 * VENTANA]
-frame_diff2 = cv2.absdiff(f1, f2)
+frame_diffb = cv2.absdiff(f1, f2)
+
+#cv2.imshow('Diffa',frame_diffa)
+#cv2.imshow('Diffb',frame_diffb)
 
 #print(frame1_gs[:,0])
 #print(frame2_gs[0,:])
+#for y in range(2 * VENTANA + 1):
+#for y in [4,9,10,11]:
+	#for x in range(2 * VENTANA + 1):
+#		x=10
+#		f2 = frame2_gs[y : frame2_gs.shape[0] + y - 2 * VENTANA, x : frame2_gs.shape[1] + x - 2 * VENTANA]
+#		frame_diff2 = cv2.absdiff(f1, f2)
+#		print(y,x)
+#		cv2.imshow('Frame' ,frame_diff2)
+#		cv2.waitKey(0)
 
 #
-cv2.imshow('Frame',frame1_gs)
-cv2.imshow('Frame1',frame2_gs)
-cv2.imshow('Diff2',frame_diff)
-cv2.imshow('Diff3',frame_diff2)
+#cv2.imshow('Frame',frame1_gs)
+#cv2.imshow('Frame1',frame2_gs)
+#cv2.imshow('Diff3',frame_diff2)
+
 
 # Press Q on keyboard to  exit
 cv2.waitKey(0)
