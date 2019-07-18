@@ -58,6 +58,22 @@ frame2_gs = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
 auto_corr = cv2.absdiff(frame1_gs, frame2_gs)
 cv2.imshow('Dif', auto_corr)
 
+hist,bins = np.histogram(auto_corr.ravel(),256,[0,256])
+print(hist)
+
+
+plt.hist(auto_corr.ravel(),256,[0,256])
+plt.show()
+
+opening = cv2.morphologyEx(auto_corr, cv2.MORPH_OPEN, np.ones((2,2),np.uint8))
+cv2.imshow('open', opening)
+
+opening2 = cv2.morphologyEx(opening, cv2.MORPH_OPEN, np.ones((3,3),np.uint8))
+cv2.imshow('open2', opening2)
+
+ret,thresh1 = cv2.threshold(opening,10,255,cv2.THRESH_BINARY)
+cv2.imshow('thres', thresh1)
+
 erode = cv2.erode(auto_corr,np.ones((2,2),np.uint8),1)
 cv2.imshow('erd', erode)
 
@@ -73,6 +89,16 @@ cv2.imshow('erd3', erode3)
 
 dilation2 = cv2.dilate(erode3,np.ones((2,2),np.uint8),1)
 cv2.imshow('dil2', dilation2)
+
+
+ret,thresh2 = cv2.threshold(dilation2,4,255,cv2.THRESH_BINARY)
+cv2.imshow('thres2', thresh2)
+
+opening3 = cv2.morphologyEx(thresh2, cv2.MORPH_OPEN, np.ones((3,3),np.uint8))
+cv2.imshow('open3', opening3)
+opening3 = cv2.morphologyEx(thresh2, cv2.MORPH_CLOSE, np.ones((3,3),np.uint8))
+cv2.imshow('open3', opening3)
+
 
 print(frame1_gs.shape)
 
@@ -90,11 +116,11 @@ for y in range(-VENTANA, VENTANA + 1):
 cross_corr_max_x = cross_corr.argmax() % LEN
 cross_corr_max_y = cross_corr.argmax() // LEN
 
-print(cross_corr/cross_corr.max() )
-#print(cross_corr.max())
-print(cross_corr.argmax())
-print("max:")
-print(cross_corr_max_y, cross_corr_max_x)
+#print(cross_corr/cross_corr.max() )
+##print(cross_corr.max())
+#print(cross_corr.argmax())
+#print("max:")
+#print(cross_corr_max_y, cross_corr_max_x)
 
 frame_diffa = cv2.absdiff(frame1_gs[VENTANA : frame1_gs.shape[0] - VENTANA, VENTANA : frame1_gs.shape[1] - VENTANA], frame2_gs[VENTANA : frame1_gs.shape[0] - VENTANA, VENTANA : frame1_gs.shape[1] - VENTANA])
 
@@ -125,4 +151,4 @@ frame_diffb = cv2.absdiff(f1, f2)
 
 # Press Q on keyboard to  exit
 cv2.waitKey(0)
-cv2.destroyAllWindows()
+cv2.destroyAllWindows() 
